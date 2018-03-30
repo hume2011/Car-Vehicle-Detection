@@ -80,13 +80,8 @@ def get_hog_features(img, orient, pix_per_cell, cell_per_block, vis=True, featur
                                   block_norm= 'L2-Hys', transform_sqrt=False, 
                                   visualise= vis, feature_vector= feature_vec)
     
-    # name returns explicitly
-    hog_features = return_list[0]
-    if vis:
-        hog_image = return_list[1]
-        return hog_features, hog_image
-    else:
-        return hog_features
+    
+    return return_list
     
 # Extract features from and image
 def extract_features(img, orient=9, pix_per_cell=8, cell_per_block=2):
@@ -94,6 +89,5 @@ def extract_features(img, orient=9, pix_per_cell=8, cell_per_block=2):
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     hog_features = get_hog_features(gray, orient, pix_per_cell, cell_per_block, vis=False, feature_vec=True)
     
-    print(s_features.shape, hog_features.shape)
-    return np.hstack((s_features, hog_features))
+    return np.concatenate((s_features, hog_features))
     
