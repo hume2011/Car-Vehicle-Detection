@@ -2,6 +2,7 @@ import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import cv2
 import numpy as np
+import pickle
 from mpl_toolkits.mplot3d import Axes3D
 from skimage.feature import hog
 
@@ -16,13 +17,13 @@ def read_rgb(file_path):
     return mpimg.imread(file_path)
 
 # Plot images
-def display(img_list, size = (2,2), fig_size = (10,10), cm = None):
+def display(img_list, size = (2,2), fig_size = (10,10), cm = None, ax = 'off'):
     fig, axes = plt.subplots(size[0], size[1], figsize=fig_size)
     axes = axes.ravel()
     fig.subplots_adjust(hspace=0.1, wspace=0.1)
     for i in range(len(img_list)):
         axes[i].imshow(img_list[i], cmap=cm)
-        axes[i].axis('off')
+        axes[i].axis(ax)
         #axes[i].set_title(file_path[i].split('/')[-1].split('.')[0])
         
         
@@ -234,30 +235,6 @@ def draw_labeled_windows(img, labels):
         bbox = ((np.min(nonzerox), np.min(nonzeroy)), (np.max(nonzerox), np.max(nonzeroy)))
         # Draw the box on the image
         cv2.rectangle(img, bbox[0], bbox[1], (0,255,0), 6)
-        cv2.putText(img, 'car', bbox[0], cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
+        cv2.putText(img, 'car', (bbox[0][0],bbox[0][1]-2), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
     # Return the image
     return img
-
-
-# Process one image
-def process_image(img, scaler, classifier):
-    
-    windows1 = utils.slide_window(img,x_range=[None,None],y_range=[360,656],wind_size=(256,256),overlap=ol)
-    windows2 = utils.slide_window(img,x_range=[None,None],y_range=[360,656],wind_size=(192,192),overlap=ol)
-    windows3 = utils.slide_window(img,x_range=[None,None],y_range=[360,656],wind_size=(128,128),overlap=ol)
-    windows4 = utils.slide_window(img,x_range=[None,None],y_range=[360,656],wind_size=(64,64),overlap=ol)
-    #windows5 = utils.slide_window(test_image,x_range=[None,None],y_range=[360,432],wind_size=(64,64),overlap=ol)
-    #windows6 = utils.slide_window(test_image,x_range=[None,None],y_range=[360,452],wind_size=(64,64),overlap=ol)
-    windows = windows1 + windows2 + windows3 + windows4
-    car_windows = utils.classify_windows(img, windows, scaler, clf)
-
-    heat = np.zeros_like(img[:,:,0])
-    heat_img = utils.add_heat(heat, car_windows)
-    
-    thres_img = utils.apply_threshold(heat_img, 6)
-    
-    labels = label(thres_img)
-    
-    result_img = utils.draw_labeled_windows(img,labels)
-    
-    return result_img
